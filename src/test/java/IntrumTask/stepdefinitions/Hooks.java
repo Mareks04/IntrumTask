@@ -11,7 +11,6 @@ public class Hooks {
 
     @Before
     public void beforeHook(Scenario scenario){
-        TestCaseContext.init();
         TestCaseContext.setScenario(scenario);
         System.out.println("THE SCENARIO HAS STARTED");
     }

@@ -1,19 +1,19 @@
 package IntrumTask.clients;
 
 import IntrumTask.helpers.TestCaseContext;
+import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.json.JSONObject;
-import com.opencsv.CSVReader;
+
 import java.io.FileReader;
 import java.io.IOException;
 
 import static IntrumTask.constants.ProjectConstants.API_TOKEN;
 import static IntrumTask.helpers.HelperMethods.extractIds;
-import static IntrumTask.helpers.TestCaseContext.id_values;
 
 public class GoRestClients {
 
@@ -37,13 +37,19 @@ public class GoRestClients {
             requestBody.put("email", nextLine[2]);
             requestBody.put("status", nextLine[3]);
 
-            RestAssured
+            Response response = RestAssured
                     .given(goRestSpec())
                     .body(requestBody.toString())
                     .when()
                     .post("https://gorest.co.in/public/v2/users")
                     .then().log().all()
-                    .statusCode(201);
+                    .statusCode(201)
+                    .extract().response();
+
+            JSONObject jsonResponse = new JSONObject(response.asString());
+            int id = jsonResponse.getInt("id");
+            String userId = String.valueOf(id);
+            TestCaseContext.new_users_id_values.add(userId);
         }
     }
 
@@ -69,8 +75,7 @@ public class GoRestClients {
 
 
     public static Response updateUserDetails(String key, String value) {
-        String userId = String.valueOf(TestCaseContext.random_id);
-        String endpoint = "https://gorest.co.in/public/v2/users/" + userId;
+        String endpoint = "https://gorest.co.in/public/v2/users/" + TestCaseContext.random_id;
         return RestAssured
                 .given(goRestSpec())
                 .when()
@@ -99,9 +104,8 @@ public class GoRestClients {
     public static void deleteAllUsers(){
         Response response = getAllUsers();
         extractIds(response);
-        for (int i = 0; i < TestCaseContext.id_values.size(); i++) {
-            String userId = String.valueOf(TestCaseContext.id_values.get(i));
-            deleteUser(userId);
+        for (int i = 0; i < TestCaseContext.new_users_id_values.size(); i++) {
+            deleteUser(TestCaseContext.new_users_id_values.get(i));
         }
     }
 

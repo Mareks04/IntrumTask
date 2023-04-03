@@ -72,6 +72,28 @@
   </dependencies>
 
   <build>
-
+    <plugins>
+      <plugin>
+        <groupId>com.trivago.rta</groupId>
+        <artifactId>cluecumber-report-plugin</artifactId>
+        <version>2.7.0</version>
+        <executions>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>reporting</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <customPageTitle>Tests POC Report</customPageTitle>
+          <expandBeforeAfterHooks>true</expandBeforeAfterHooks>
+          <sourceJsonReportDirectory>${project.build.directory}/cucumber-reports</sourceJsonReportDirectory>
+          <generatedHtmlReportDirectory>${project.build.directory}/generated-reports
+          </generatedHtmlReportDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>
